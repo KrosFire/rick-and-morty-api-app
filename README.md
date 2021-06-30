@@ -1,4 +1,4 @@
-# rickandmoryapi
+# rickandmortyapi
 
 ## Project setup
 ```
