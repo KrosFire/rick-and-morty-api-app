@@ -1,4 +1,4 @@
-# rickandmortyapi
+# Rick & Morty character browser
 
 ## Project setup
 ```

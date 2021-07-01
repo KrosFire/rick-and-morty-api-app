@@ -1,0 +1,12 @@
+@import "./variables";
+
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+body {
+  @apply text-secondary;
+  font-family: var(--primary-font);
+}
