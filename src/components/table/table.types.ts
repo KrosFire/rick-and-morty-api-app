@@ -10,11 +10,11 @@ export interface Columns {
   name: string;
 }
 
-export interface Action {
-  icon: string;
-  actionID: number;
+export interface Field {
+  content: string;
 }
 
-export interface Field {
-  content: string | Action;
+export interface TableRecord {
+  id: string;
+  record: Field[];
 }

@@ -1,39 +1,53 @@
 <template>
-  <table class="table">
-    <thead class="container mx-auto">
-      <slot name="head">
-        <tr>
+  <table
+    class="
+      flex flex-col
+      max-w-full
+      overflow-x-scroll
+      text-secondary
+      md:overflow-x-hidden
+    "
+  >
+    <thead class="w-full text-secondary bg-accent-light bg-opacity-25 p-4">
+      <tr :class="`grid-cols-${columns.length}`" class="tableGrid">
+        <slot name="head">
           <th
             v-for="({ name }, index) of columns"
             :key="index"
-            class="capitalize"
+            class="capitalize text-left"
           >
             {{ name }}
           </th>
-        </tr>
-      </slot>
+        </slot>
+      </tr>
     </thead>
-    <tbody>
+    <tbody class="w-full">
       <slot name="body">
-        <tr v-for="(record, index) of data" :key="index">
-          <td v-for="({ content: field }, index) of record" :key="index">
-            <slot :name="columns[index].name">
-              <component
-                v-if="columns[index].type === ColumnTypes.ACTION"
-                :is="field.icon"
-                @click.stop="$emit('click', field.actionID)"
-              />
-              <GenderComponent
-                v-else-if="columns[index].type === ColumnTypes.GENDER"
-                :type="field"
-              />
-              <img
-                v-else-if="columns[index].type === ColumnTypes.IMAGE"
-                :src="field"
-              />
-              <span v-else> {{ field }} </span>
-            </slot>
-          </td>
+        <tr
+          v-for="{ id, record } of data"
+          :key="id"
+          class="block px-4 border-b border-accent-default w-full py-2"
+        >
+          <div :class="`grid-cols-${columns.length}`" class="tableGrid">
+            <td
+              v-for="({ content: field }, index) of record"
+              :key="index"
+              class="flex items-center"
+            >
+              <slot :record="record" :id="id" :name="columns[index].name">
+                <GenderComponent
+                  v-if="columns[index].type === ColumnTypes.GENDER"
+                  :type="field"
+                />
+                <img
+                  v-else-if="columns[index].type === ColumnTypes.IMAGE"
+                  :src="field"
+                  class="w-16 h-auto"
+                />
+                <span v-else> {{ field }} </span>
+              </slot>
+            </td>
+          </div>
         </tr>
       </slot>
     </tbody>
@@ -41,7 +55,11 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Columns, ColumnTypes } from "@/components/table/table.types";
+import {
+  Columns,
+  ColumnTypes,
+  TableRecord,
+} from "@/components/table/table.types";
 import GenderComponent from "@/components/genderComponent/GenderComponent.vue";
 
 export default defineComponent({
@@ -56,7 +74,7 @@ export default defineComponent({
       required: true,
     },
     data: {
-      type: Array,
+      type: Array as PropType<TableRecord[]>,
       default: () => [],
     },
   },
@@ -67,3 +85,16 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+table {
+  thead,
+  tbody {
+    min-width: 40rem;
+  }
+
+  .tableGrid {
+    @apply grid gap-4 container mx-auto w-full;
+  }
+}
+</style>

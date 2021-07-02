@@ -2,7 +2,7 @@
   <router-link
     :to="to"
     ref="routerLink"
-    class="navElement block text-secondary"
+    class="navElement block text-secondary text-left"
   >
     <slot />
   </router-link>
