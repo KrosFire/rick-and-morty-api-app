@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/FavoriteCharacters",
     name: "FavoriteCharacters",
-    component: (): Promise<any> =>
+    component: () =>
       import("@/views/FavoriteCharacters/FavoritesCharacters.vue"),
   },
 ];

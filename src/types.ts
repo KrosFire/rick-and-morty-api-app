@@ -4,3 +4,7 @@ export enum Gender {
   GENDERLESS = "GENDERLESS",
   UNKNOWN = "UNKNOWN",
 }
+
+export enum LocalStorage {
+  FAVORITE = "FAVORITE_CHARACTERS",
+}

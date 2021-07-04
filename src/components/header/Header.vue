@@ -32,7 +32,7 @@ export default defineComponent({
   },
   setup() {
     const searchHandler = (query: string): void => {
-      console.log(query);
+      console.log(query); // TODO
     };
 
     return {

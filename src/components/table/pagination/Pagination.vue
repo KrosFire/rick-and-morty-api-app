@@ -2,38 +2,48 @@
   <ul class="flex">
     <li>
       <PaginationButton
+        :disabled="currentPage === 1"
         :type="PaginationButtonType.NEXT"
+        @click="handleEmit(currentPage - 1)"
         class="prevPage"
-        ref=""
       />
     </li>
     <li v-if="displayFirst">
       <PaginationButton
         :pageNumber="1"
         :type="PaginationButtonType.PAGE"
+        @click="handleEmit(1)"
         class="firstPage"
       />
     </li>
-    <li v-if="displayDotLeft">
+    <li v-if="displayFirst">
       <PaginationButton :type="PaginationButtonType.DOT" class="dots" />
     </li>
     <li v-for="(page, index) of pagesToNavigate" :key="index">
-      <PaginationButton :pageNumber="page" :type="PaginationButtonType.PAGE" />
+      <PaginationButton
+        :active="page === currentPage"
+        :pageNumber="page"
+        :type="PaginationButtonType.PAGE"
+        @click="handleEmit(page)"
+      />
     </li>
-    <li v-if="displayDotRight">
+    <li v-if="displayLast">
       <PaginationButton :type="PaginationButtonType.DOT" class="dots" />
     </li>
     <li v-if="displayLast">
       <PaginationButton
         :pageNumber="amountOfPages"
         :type="PaginationButtonType.PAGE"
+        @click="handleEmit(amountOfPages)"
         class="lastPage"
       />
     </li>
     <li>
       <PaginationButton
+        :disabled="currentPage === amountOfPages"
         :type="PaginationButtonType.PREVIOUS"
-        class="prevPage"
+        @click="handleEmit(currentPage + 1)"
+        class="nextPage"
       />
     </li>
   </ul>
@@ -42,12 +52,14 @@
 import { defineComponent, ref, watchEffect } from "vue";
 import PaginationButton from "@/components/table/pagination/PaginationButton.vue";
 import { PaginationButtonType } from "@/components/table/pagination/pagination.types";
+import { range } from "@/helpers";
 
 export default defineComponent({
   name: "Pagination",
   components: {
     PaginationButton,
   },
+  emits: ["click"],
   props: {
     amountOfPages: {
       type: Number,
@@ -59,31 +71,23 @@ export default defineComponent({
     },
     visiblePages: {
       type: Number,
-      default: 5,
+      default: 6,
     },
   },
-  setup(props) {
+  setup(props, context) {
     const pagesToNavigate = ref<number[]>([]);
     const displayFirst = ref<boolean>(false);
     const displayLast = ref<boolean>(false);
-    const displayDotLeft = ref<boolean>(false);
-    const displayDotRight = ref<boolean>(false);
 
-    const range = (from: number, to: number): number[] => {
-      const range = [];
-
-      for (let i = from; i <= to; i++) {
-        range.push(i);
+    const handleEmit = (pageNumber: number): void => {
+      if (pageNumber >= 1 && pageNumber <= props.amountOfPages) {
+        context.emit("click", pageNumber);
       }
-
-      return range;
     };
 
     watchEffect(() => {
       displayFirst.value = false;
       displayLast.value = false;
-      displayDotLeft.value = false;
-      displayDotRight.value = false;
 
       if (props.visiblePages === 0) {
         pagesToNavigate.value = [];
@@ -93,39 +97,27 @@ export default defineComponent({
         return;
       }
 
-      const even = props.visiblePages % 2 === 0 ? 1 : 0;
+      let from = 1;
+      let to = 1;
+
       const prevPages = Math.floor(props.visiblePages / 2);
-      const nextPages = props.visiblePages - prevPages + 1 + even;
+      const nextPages = props.visiblePages - prevPages + 1;
 
-      let from = 0;
-      let to = 0;
-
-      if (props.currentPage > prevPages && props.currentPage < nextPages) {
-        displayFirst.value = true;
+      if (props.currentPage + 2 <= props.visiblePages) {
         displayLast.value = true;
-        displayDotLeft.value = true;
-        displayDotRight.value = true;
-
-        from = props.currentPage - prevPages + 2;
-        to = props.currentPage + prevPages - 2 - even;
-      } else if (props.currentPage === prevPages) {
-        displayLast.value = true;
-        displayDotRight.value = true;
-
-        from = 1;
-        to = props.currentPage + prevPages - 1 - even;
-      } else if (props.currentPage === nextPages) {
+        to = props.visiblePages - 1;
+      } else if (
+        props.currentPage + props.visiblePages - 3 >=
+        props.amountOfPages
+      ) {
         displayFirst.value = true;
-        displayDotLeft.value = true;
-
-        from = props.currentPage - prevPages + 1;
+        from = props.amountOfPages - props.visiblePages + 3 - 1;
         to = props.amountOfPages;
       } else {
+        displayFirst.value = true;
         displayLast.value = true;
-        displayDotRight.value = true;
-
-        from = 1;
-        to = nextPages;
+        from = props.currentPage - prevPages + 1;
+        to = nextPages + props.currentPage - 3;
       }
 
       pagesToNavigate.value = range(from, to);
@@ -135,8 +127,7 @@ export default defineComponent({
       pagesToNavigate,
       displayFirst,
       displayLast,
-      displayDotLeft,
-      displayDotRight,
+      handleEmit,
       PaginationButtonType,
     };
   },
@@ -145,7 +136,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 ul {
   li {
-    @apply mr-2 ml-2;
+    @apply mr-1 ml-1;
 
     &:first-child {
       @apply ml-0;

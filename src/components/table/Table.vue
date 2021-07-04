@@ -1,13 +1,5 @@
 <template>
-  <table
-    class="
-      flex flex-col
-      max-w-full
-      overflow-x-scroll
-      text-secondary
-      md:overflow-x-hidden
-    "
-  >
+  <table class="flex flex-col max-w-full overflow-x-auto text-secondary">
     <thead class="w-full text-secondary bg-accent-light bg-opacity-25 p-4">
       <tr :class="`grid-cols-${columns.length}`" class="tableGrid">
         <slot name="head">
@@ -32,7 +24,7 @@
             <td
               v-for="({ content: field }, index) of record"
               :key="index"
-              class="flex items-center"
+              class="flex items-center text-left"
             >
               <slot :record="record" :id="id" :name="columns[index].name">
                 <GenderComponent

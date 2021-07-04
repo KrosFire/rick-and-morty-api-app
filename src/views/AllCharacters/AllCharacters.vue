@@ -7,10 +7,12 @@
       />
     </template>
   </Table>
-  <div class="pagination px-4 py-10">
+  <div class="pagination max-w-full px-4 py-10 overflow-x-auto">
     <Pagination
       :amountOfPages="amountOfPages"
       :currentPage="currentPage"
+      :visiblePages="5"
+      @click="changePage"
       class="mx-auto container"
     />
   </div>
@@ -20,6 +22,7 @@
 import { defineComponent, ref, inject, watchEffect } from "vue";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { FetchResponse } from "@/api/useFetch.types";
+import { LocalStorage } from "@/types";
 import { fetchRecords } from "@/api/useFetch";
 import {
   Columns,
@@ -81,21 +84,65 @@ export default defineComponent({
     const contentPerPage = ref<number>(8);
     const amountOfPages = ref<number>(0);
 
-    if (apolloClient !== undefined) {
-      records.value = fetchRecords(
-        apolloClient,
-        currentPage.value,
-        contentPerPage.value
-      );
-    } else {
-      console.error("Apollo client is undefined!");
-    }
+    const fetchData = (): void => {
+      if (apolloClient !== undefined) {
+        records.value = fetchRecords(
+          apolloClient,
+          currentPage.value,
+          contentPerPage.value
+        );
+      } else {
+        console.error("Apollo client is undefined!");
+      }
+    };
+
+    fetchData();
+
+    const changePage = (page: number): void => {
+      currentPage.value = page;
+      fetchData();
+    };
+
+    const isFavoriteCharacter = (id: string): boolean => {
+      const FavoriteCharacters = localStorage.getItem(LocalStorage.FAVORITE);
+
+      return FavoriteCharacters ? id in JSON.parse(FavoriteCharacters) : false;
+    };
+
+    const setFavorite = (id: string): void => {
+      const FavoriteCharacters = localStorage.getItem(LocalStorage.FAVORITE);
+
+      if (records.value.data !== undefined) {
+        const mapOfFavorite = JSON.parse(
+          FavoriteCharacters ? FavoriteCharacters : "{}"
+        ) as Record<string, Record<string, unknown>>;
+
+        for (let character of records.value.data.records) {
+          if (character.id === id) {
+            if (id in mapOfFavorite) {
+              delete mapOfFavorite[id];
+            } else {
+              mapOfFavorite[id] = character;
+            }
+
+            localStorage.setItem(
+              LocalStorage.FAVORITE,
+              JSON.stringify(mapOfFavorite)
+            );
+            isFavoriteCharacter(id);
+            return;
+          }
+        }
+      }
+    };
 
     watchEffect(() => {
       if (!records.value.loading && records.value.data !== undefined) {
         amountOfPages.value = Math.ceil(
           records.value.data.numberOfRecords / contentPerPage.value
         );
+
+        data.value = [];
 
         records.value.data.records.forEach((record) => {
           data.value.push({
@@ -114,26 +161,6 @@ export default defineComponent({
       }
     });
 
-    const isFavoriteCharacter = (id: string): boolean => {
-      return !!localStorage.getItem(id);
-    };
-
-    const setFavorite = (id: string): void => {
-      if (records.value.data !== undefined) {
-        for (let character of records.value.data.records) {
-          if (character.id === id) {
-            if (localStorage.getItem(id)) {
-              localStorage.removeItem(id);
-            } else {
-              localStorage.setItem(id, JSON.stringify(character));
-            }
-            isFavoriteCharacter(id);
-            return;
-          }
-        }
-      }
-    };
-
     return {
       contentPerPage,
       currentPage,
@@ -142,6 +169,7 @@ export default defineComponent({
       lastSlotName,
       records,
       data,
+      changePage,
       isFavoriteCharacter,
       setFavorite,
     };

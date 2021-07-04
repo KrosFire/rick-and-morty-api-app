@@ -31,7 +31,7 @@
   </button>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watchEffect } from "vue";
 import { PaginationButtonType } from "@/components/table/pagination/pagination.types";
 import NextIcon from "@/components/icons/PrevIcon.vue";
 import PrevIcon from "@/components/icons/NextIcon.vue";
@@ -70,6 +70,14 @@ export default defineComponent({
         props.type === PaginationButtonType.NEXT
     );
 
+    watchEffect(() => {
+      isDisabled.value =
+        props.disabled || props.type === PaginationButtonType.DOT;
+      isControlButton.value =
+        props.type === PaginationButtonType.PREVIOUS ||
+        props.type === PaginationButtonType.NEXT;
+    });
+
     const handleEmit = (): void => {
       if (props.type !== PaginationButtonType.DOT) {
         context.emit("click", props.type, props.pageNumber);
@@ -93,7 +101,7 @@ export default defineComponent({
     @apply cursor-pointer;
 
     &:hover,
-    &:active {
+    &[active="true"] {
       @apply bg-primary text-white;
     }
 
