@@ -1,7 +1,6 @@
 import { reactive } from "vue";
 import { gql, ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { FetchResponse, ApiResponse, Result } from "./useFetch.types";
-import { range } from "@/helpers";
 
 export const fetchRecords = (
   apolloClient: ApolloClient<NormalizedCacheObject>,
@@ -23,9 +22,7 @@ export const fetchRecords = (
   const firstPage = Math.floor(from / 20) + 1;
   const lastPage = Math.floor(to / 20) + 1;
 
-  const pages = range(firstPage, lastPage);
-
-  for (const page of pages) {
+  for (let page = firstPage; page <= lastPage; page++) {
     const query = gql`
       query fetchRecords {
         characters(
@@ -81,7 +78,12 @@ export const fetchRecords = (
           }
 
           response.data.records = response.data.records.concat(records);
+          response.data.records.sort((a, b) => +a.id - +b.id);
         }
+      })
+      .catch((err) => {
+        response.loading = false;
+        console.error(err);
       });
   }
 
