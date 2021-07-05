@@ -1,6 +1,6 @@
 <template>
   <div class="gender flex">
-    <component class="fill-current pr-1" :is="genderIcon" />
+    <component class="fill-current pr-1 min-w-min" :is="genderIcon" />
     <span class="capitalize"> {{ type }} </span>
   </div>
 </template>

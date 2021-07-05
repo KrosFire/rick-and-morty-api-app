@@ -3,7 +3,7 @@ import AllCharacters from "@/views/AllCharacters/AllCharacters.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/:query?",
     name: "AllCharacters",
     component: AllCharacters,
   },
@@ -12,6 +12,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "FavoriteCharacters",
     component: () =>
       import("@/views/FavoriteCharacters/FavoritesCharacters.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "PageNotFound",
+    component: () => import("@/views/NotFound/NotFound.vue"),
   },
 ];
 

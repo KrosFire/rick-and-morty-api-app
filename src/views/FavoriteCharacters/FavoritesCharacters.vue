@@ -84,6 +84,10 @@ export default defineComponent({
           Object.keys(mapOfFavorite).length / contentPerPage.value
         );
 
+        if (currentPage.value > amountOfPages.value) {
+          currentPage.value = amountOfPages.value;
+        }
+
         const from = (currentPage.value - 1) * contentPerPage.value;
         const to = Math.min(
           currentPage.value * contentPerPage.value,
@@ -132,10 +136,7 @@ export default defineComponent({
           JSON.stringify(mapOfFavorite)
         );
 
-        data.value = data.value.filter((el) => {
-          console.log(el.id !== id);
-          return el.id !== id;
-        });
+        data.value = data.value.filter((el) => el.id !== id);
 
         return;
       }

@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, inject, watchEffect } from "vue";
+import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { FetchResponse } from "@/api/useFetch.types";
 import { LocalStorage } from "@/types";
@@ -41,6 +42,8 @@ export default defineComponent({
     Pagination,
   },
   setup() {
+    const router = ref<RouteLocationNormalizedLoaded>(useRoute());
+    const query = ref<string | string[]>(router.value.params.query);
     const currentPage = ref<number>(1);
     const apolloClient: ApolloClient<NormalizedCacheObject> | undefined =
       inject("DefaultApolloClient");
@@ -85,11 +88,12 @@ export default defineComponent({
     const amountOfPages = ref<number>(0);
 
     const fetchData = (): void => {
-      if (apolloClient !== undefined) {
+      if (apolloClient !== undefined && !Array.isArray(query.value)) {
         records.value = fetchRecords(
           apolloClient,
           currentPage.value,
-          contentPerPage.value
+          contentPerPage.value,
+          query.value
         );
       } else {
         console.error("Apollo client is undefined!");

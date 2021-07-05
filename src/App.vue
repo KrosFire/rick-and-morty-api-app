@@ -1,11 +1,12 @@
 <template>
   <Header />
   <Navigation :navigationLinks="navLinks" />
-  <router-view />
+  <router-view :key="route.fullPath" />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useRoute, RouteLocationNormalizedLoaded } from "vue-router";
 import Header from "@/components/header/Header.vue";
 import Navigation from "@/components/navigation/Navigation.vue";
 import { NavigationLink } from "@/components/navigation/Navigation.types";
@@ -27,9 +28,11 @@ export default defineComponent({
         name: "Favorite",
       },
     ]);
+    const route = ref<RouteLocationNormalizedLoaded>(useRoute());
 
     return {
       navLinks,
+      route,
     };
   },
 });

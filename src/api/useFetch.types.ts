@@ -3,7 +3,7 @@ export interface Episode {
   episode: string;
 }
 
-export interface Record {
+export interface Result {
   image: string;
   id: string;
   name: string;
@@ -12,9 +12,18 @@ export interface Record {
   episode: Episode[];
 }
 
+export interface Info {
+  count: string;
+}
+
+export interface ApiResponse {
+  info: Info;
+  results: Result[];
+}
+
 export interface Data {
   numberOfRecords: number;
-  records: Record[];
+  records: Result[];
 }
 
 export interface FetchResponse {

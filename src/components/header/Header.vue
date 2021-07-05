@@ -20,7 +20,8 @@
   </header>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { useRouter, Router } from "vue-router";
 import Logo from "@/components/logo/Logo.vue";
 import SearchBar from "@/components/searchBar/SearchBar.vue";
 
@@ -31,8 +32,9 @@ export default defineComponent({
     SearchBar,
   },
   setup() {
+    const router = ref<Router>(useRouter());
     const searchHandler = (query: string): void => {
-      console.log(query); // TODO
+      router.value.push(`/${query}`);
     };
 
     return {

@@ -1,38 +1,14 @@
-import { reactive, watchEffect } from "vue";
+import { reactive } from "vue";
 import { gql, ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
-import { FetchResponse, FetchNumberOfRecords } from "./useFetch.types";
+import { FetchResponse, ApiResponse, Result } from "./useFetch.types";
 import { range } from "@/helpers";
-
-export const fetchNumberOfRecords = (
-  apolloClient: ApolloClient<NormalizedCacheObject>
-): FetchNumberOfRecords => {
-  const response = reactive<FetchNumberOfRecords>({ loading: true, data: 0 });
-
-  const query = gql`
-    query fetchNumberOfRecords {
-      characters {
-        info {
-          count
-        }
-      }
-    }
-  `;
-
-  apolloClient.query({ query }).then(({ data }) => {
-    response.data = data.characters.info.count;
-    response.loading = false;
-  });
-
-  return response;
-};
 
 export const fetchRecords = (
   apolloClient: ApolloClient<NormalizedCacheObject>,
   page: number,
   pageSize: number,
-  ids: number[] = []
+  filter = ""
 ): FetchResponse => {
-  const numberOfRecords = fetchNumberOfRecords(apolloClient);
   const response = reactive<FetchResponse>({
     loading: true,
     data: {
@@ -41,58 +17,73 @@ export const fetchRecords = (
     },
   });
 
-  if (ids.length === 0) {
-    const firstRecordId = (page - 1) * pageSize + 1;
-    ids = range(firstRecordId, pageSize + firstRecordId - 1);
-  }
+  const from = (page - 1) * pageSize + 1;
+  const to = from + pageSize - 1;
 
-  const query = gql`
-    query fetchRecords {
-      charactersByIds(ids:[${ids}]) {
-        id
-        image
-        name
-        gender
-        species
-        episode {
+  const firstPage = Math.floor(from / 20) + 1;
+  const lastPage = Math.floor(to / 20) + 1;
+
+  const pages = range(firstPage, lastPage);
+
+  for (const page of pages) {
+    const query = gql`
+      query fetchRecords {
+        characters(
+          page: ${page}
+          filter: {
+            name: "${filter}"
+        }) {
+        info{
+          count
+        }
+        results {
           id
-          episode
+          image
+          name
+          gender
+          species
+          episode {
+            id
+            episode
+          }
         }
       }
     }
-  `;
+    `;
 
-  watchEffect(() => {
-    if (!numberOfRecords.loading) {
-      apolloClient
-        .query({ query })
-        .then(({ data }) => data)
-        .then(({ charactersByIds }) => {
-          response.data = {
-            numberOfRecords: numberOfRecords.data,
-            records: charactersByIds,
-          };
-          response.loading = false;
-        });
-    }
-  });
+    apolloClient
+      .query({ query })
+      .then(({ data }) => data)
+      .then(({ characters }) => characters)
+      .then((res: ApiResponse) => {
+        if (response.data) {
+          response.data.numberOfRecords = +res.info.count;
+
+          const firstRecord = (from - 1) % 20;
+          const lastRecord = Math.min(to % 20, res.results.length);
+          let records: Result[] = [];
+          if (page === firstPage && page === lastPage) {
+            for (let i = firstRecord; i < lastRecord; i++) {
+              records.push(res.results[i]);
+            }
+            response.loading = false;
+          } else if (page === firstPage) {
+            for (let i = firstRecord; i < res.results.length; i++) {
+              records.push(res.results[i]);
+            }
+          } else if (page === lastPage) {
+            for (let i = 0; i < lastRecord; i++) {
+              records.push(res.results[i]);
+            }
+            response.loading = false;
+          } else {
+            records = res.results;
+          }
+
+          response.data.records = response.data.records.concat(records);
+        }
+      });
+  }
 
   return response;
 };
-
-// export const fetchFilteredRecords = (
-//                                       apolloClient: ApolloClient<NormalizedCacheObject>,
-//                                       page: number,
-//                                       pageSize: number,
-//                                       ids: string[]
-// ): FetchResponse => {
-//   const numberOfRecords = fetchNumberOfRecords(apolloClient);
-//   const response = reactive<FetchResponse>({
-//     loading: true,
-//     data: {
-//       numberOfRecords: 0,
-//       records: [],
-//     },
-//   });
-
-// };

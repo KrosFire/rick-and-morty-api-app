@@ -6,7 +6,7 @@
           <th
             v-for="({ name }, index) of columns"
             :key="index"
-            class="capitalize text-left"
+            class="capitalize text-left max-w-full"
           >
             {{ name }}
           </th>
@@ -24,12 +24,13 @@
             <td
               v-for="({ content: field }, index) of record"
               :key="index"
-              class="flex items-center text-left"
+              class="flex items-center text-left overflow-x-auto"
             >
               <slot :record="record" :id="id" :name="columns[index].name">
                 <GenderComponent
                   v-if="columns[index].type === ColumnTypes.GENDER"
                   :type="field"
+                  class="max-w-full"
                 />
                 <img
                   v-else-if="columns[index].type === ColumnTypes.IMAGE"
