@@ -47,7 +47,7 @@
   </table>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import {
   Columns,
   ColumnTypes,
