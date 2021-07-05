@@ -50,31 +50,31 @@ export default defineComponent({
     const columns = ref<Columns[]>([
       {
         type: ColumnTypes.IMAGE,
-        name: "photo",
+        name: "Photo",
       },
       {
         type: ColumnTypes.TEXT,
-        name: "character id",
+        name: "Character ID",
       },
       {
         type: ColumnTypes.TEXT,
-        name: "name",
+        name: "Name",
       },
       {
         type: ColumnTypes.GENDER,
-        name: "gender",
+        name: "Gender",
       },
       {
         type: ColumnTypes.TEXT,
-        name: "species",
+        name: "Species",
       },
       {
         type: ColumnTypes.TEXT,
-        name: "last episode",
+        name: "Last Episode",
       },
       {
         type: ColumnTypes.ACTION,
-        name: "add to favorites",
+        name: "Add To Favorites",
       },
     ]);
     const lastSlotName = ref<string>(

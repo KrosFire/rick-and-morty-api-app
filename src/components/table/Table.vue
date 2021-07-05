@@ -6,7 +6,7 @@
           <th
             v-for="({ name }, index) of columns"
             :key="index"
-            class="capitalize text-left max-w-full"
+            class="text-left max-w-full"
           >
             {{ name }}
           </th>
@@ -47,7 +47,7 @@
   </table>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
+import { defineComponent, PropType } from "vue";
 import {
   Columns,
   ColumnTypes,
