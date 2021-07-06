@@ -133,7 +133,6 @@ export default defineComponent({
               LocalStorage.FAVORITE,
               JSON.stringify(mapOfFavorite)
             );
-            isFavoriteCharacter(id);
             return;
           }
         }

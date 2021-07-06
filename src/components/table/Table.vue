@@ -26,7 +26,7 @@
               :key="index"
               class="flex items-center text-left overflow-x-auto"
             >
-              <slot :record="record" :id="id" :name="columns[index].name">
+              <slot :name="columns[index].name" :record="record" :id="id">
                 <GenderComponent
                   v-if="columns[index].type === ColumnTypes.GENDER"
                   :type="field"

@@ -137,8 +137,6 @@ export default defineComponent({
         );
 
         data.value = data.value.filter((el) => el.id !== id);
-
-        return;
       }
     };
 

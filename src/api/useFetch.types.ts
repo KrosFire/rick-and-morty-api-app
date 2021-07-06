@@ -30,8 +30,3 @@ export interface FetchResponse {
   loading: boolean;
   data?: Data;
 }
-
-export interface FetchNumberOfRecords {
-  loading: boolean;
-  data: number;
-}
