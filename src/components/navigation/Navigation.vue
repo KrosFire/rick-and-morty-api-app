@@ -14,7 +14,7 @@
         v-for="(navLink, index) of navigationLinks"
         :key="index"
         :to="navLink.to"
-        class="mr-8"
+        class="mr-8 md:mr-20"
       >
         {{ navLink.name }}
       </NavigationElement>

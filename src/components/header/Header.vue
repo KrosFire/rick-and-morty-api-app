@@ -11,7 +11,7 @@
       "
     >
       <slot name="logo">
-        <router-link to="/" class="block mb-3 md:mb-0 md:mr-4">
+        <router-link to="/" class="block mb-3 md:mb-0 md:mr-20">
           <Logo />
         </router-link>
       </slot>
